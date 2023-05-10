@@ -6,42 +6,42 @@
 	(:requirements :typing :fluents :negative-preconditions)
 
 	(:types
-		block
+		block gripper
 		; we do not need a table type as we use a special ontable predicate
-	)
+		)
 
 	(:predicates
 		(on ?a ?b - block) ; block `?a` is top of block `?b`
 		(clear ?a - block) ; there is nothing on top of block `?a`
 		(ontable ?a - block) ; block `?a` is on table
 		(holding ?a - block) ; gripper is holding block `?a`
-		(handempty) ; gripper is not holding any block
+		(handempty ?g - gripper) ; gripper is not holding any block
 	)
 
 	(:action pickup ; this action is only for picking from table
-		:parameters (?a - block)
+		:parameters (?a - block ?g - gripper)
 		:precondition (and
 			(ontable ?a)
-			(handempty)
+			(handempty ?g)
 			(clear ?a)
 		)
 		:effect (and
-			(holding ?a)
-			(not (handempty))
+			(holding ?a ?g)
+			(not (handempty ?g))
 			(not (clear ?a))
 			(not (ontable ?a))
 		)
 	)
 	(:action unstack ; only suitable for picking from block
-		:parameters (?a ?b - block)
+		:parameters (?a ?b - block ?g - gripper)
 		:precondition (and
 			(on ?a ?b)
-			(handempty)
+			(handempty ?g)
 			(clear ?a)
 		)
 		:effect (and
-			(holding ?a)
-			(not (handempty))
+			(holding ?a ?g)
+			(not (handempty ?g))
 			(not (clear ?a))
 			(clear ?b)
 			(not (on ?a ?b))
@@ -49,28 +49,28 @@
 	)
 
 	(:action putdown
-		:parameters (?a - block)
+		:parameters (?a - block ?g - gripper)
 		:precondition (and
-			(holding ?a)
+			(holding ?a ?g)
 		)
 		:effect (and
 			(ontable ?a)
-			(not (holding ?a))
-			(handempty)
+			(not (holding ?a ?g))
+			(handempty ?g)
 			(clear ?a)
 		)
 	)
 
 	(:action stack
-		:parameters (?a ?b - block)
+		:parameters (?a ?b - block ?g - gripper)
 		:precondition (and
-			(holding ?a)
+			(holding ?a ?g)
 			(clear ?b)
 		)
 		:effect (and
 			(on ?a ?b)
-			(not (holding ?a))
-			(handempty)
+			(not (holding ?a ?g))
+			(handempty ?g)
 			(not (clear ?b))
 			(clear ?a)
 		)
